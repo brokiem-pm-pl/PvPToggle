@@ -1,0 +1,5 @@
+pvp.activated: "PvP Mode Activated!"
+pvp.deactivated: "PvP Mode Deactivated!"
+
+pvp.is.activated.damager: "You haven't activated pvp mode"
+pvp.is.activated.entity: "{name} haven't activated pvp mode"
