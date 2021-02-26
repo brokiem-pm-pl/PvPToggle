@@ -1,8 +1,8 @@
 pvp.activated: "&aPvP Mode Activated!"
 pvp.deactivated: "&cPvP Mode Deactivated!"
 
-staff.pvp.activated: "Successful activated {name} PvP Mode!"
-staff.pvp.deactivated: "Successful deactivated {name} PvP Mode!"
+staff.pvp.activated: "&aSuccessful activated {name} PvP Mode!"
+staff.pvp.deactivated: "&eSuccessful deactivated {name} PvP Mode!"
 
 pvp.is.activated.damager: "&eYou haven't activated pvp mode"
 pvp.is.activated.entity: "&6{name} &ehaven't activated pvp mode"

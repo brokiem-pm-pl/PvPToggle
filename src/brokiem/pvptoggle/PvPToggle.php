@@ -17,24 +17,15 @@ use pocketmine\utils\TextFormat as TF;
 class PvPToggle extends PluginBase implements Listener
 {
 
-    /** @var array $config */
-    public $config = [];
-
-    /**
-     * @var Config $data
-     */
-    private $data;
+    /** @var array $data */
+    protected $data = [];
 
     public function onEnable(): void
     {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
 
-        $this->data = new Config($this->getDataFolder() . "pvptoggleData", Config::YAML, [
-            "list" => []
-        ]);
-
-        $this->config = $this->data->getAll();
+        $this->data = $this->getData()->getAll();
 
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->saveAllData();
@@ -62,9 +53,9 @@ class PvPToggle extends PluginBase implements Listener
 
                     if ($this->isPvpToggle($player)) {
                         $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
-                        unset($this->config["list"][array_search(strtolower($player->getName()), $this->config["list"])]);
+                        unset($this->data["list"][array_search(strtolower($player->getName()), $this->data["list"])]);
                     } else {
-                        $this->config["list"] = strtolower($player->getName());
+                        $this->data["list"] = strtolower($player->getName());
                         $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
                     }
 
@@ -73,9 +64,9 @@ class PvPToggle extends PluginBase implements Listener
 
                 if ($this->isPvpToggle($sender)) {
                     $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
-                    unset($this->config["list"][array_search(strtolower($sender->getName()), $this->config["list"])]);
+                    unset($this->data["list"][array_search(strtolower($sender->getName()), $this->data["list"])]);
                 } else {
-                    $this->config["list"] = strtolower($sender->getName());
+                    $this->data["list"] = strtolower($sender->getName());
                     $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
                 }
             }
@@ -84,13 +75,23 @@ class PvPToggle extends PluginBase implements Listener
         return true;
     }
 
+    public function getData(): Config {
+        return new Config($this->getDataFolder() . "pvptoggleData", Config::YAML, [
+            "list" => []
+        ]);
+    }
+
+    public function getAllData(): array {
+        return $this->data;
+    }
+
     /**
      * @param Player $player
      * @return bool
      */
     public function isPvpToggle(Player $player): bool
     {
-        if (in_array(strtolower($player->getName()), $this->config["list"])) {
+        if (in_array(strtolower($player->getName()), $this->data["list"])) {
             return true;
         }
 
@@ -99,8 +100,8 @@ class PvPToggle extends PluginBase implements Listener
 
     public function saveAllData(): void
     {
-        $this->data->setAll($this->config);
-        $this->data->save();
+        $this->getData()->setAll($this->data);
+        $this->getData()->save();
     }
 
     public function onHit(EntityDamageByEntityEvent $event): void
