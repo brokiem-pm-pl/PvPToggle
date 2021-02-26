@@ -52,6 +52,25 @@ class PvPToggle extends PluginBase implements Listener
     {
         if (strtolower($command->getName()) === "pvp") {
             if ($sender instanceof Player) {
+                if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
+                    $player = $this->getServer()->getPlayerExact($args[0]);
+
+                    if ($player === null) {
+                        $sender->sendMessage("Player " . $args[0] . " doesn't exits!");
+                        return true;
+                    }
+
+                    if ($this->isPvpToggle($player)) {
+                        $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                        unset($this->config["list"][array_search(strtolower($player->getName()), $this->config["list"])]);
+                    } else {
+                        $this->config["list"] = strtolower($player->getName());
+                        $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                    }
+
+                    return true;
+                }
+
                 if ($this->isPvpToggle($sender)) {
                     $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
                     unset($this->config["list"][array_search(strtolower($sender->getName()), $this->config["list"])]);
