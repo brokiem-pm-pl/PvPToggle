@@ -78,7 +78,8 @@ class PvPToggle extends PluginBase implements Listener
         return false;
     }
 
-    public function saveAllData(): void {
+    public function saveAllData(): void
+    {
         $this->data->setAll($this->config);
         $this->data->save();
     }
