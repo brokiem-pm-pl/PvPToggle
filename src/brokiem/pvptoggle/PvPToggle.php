@@ -17,15 +17,19 @@ use pocketmine\utils\TextFormat as TF;
 class PvPToggle extends PluginBase implements Listener
 {
 
-    /** @var array $data */
-    protected $data = [];
+    /** @var Config $data */
+    protected $data;
+
+    /** @var array $allData */
+    private $allData = [];
 
     public function onEnable(): void
     {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
 
-        $this->data = $this->getData()->getAll();
+        $this->data = new Config($this->getDataFolder() . "pvptoggleData.yml", Config::YAML, ["list" => []]);
+        $this->allData = $this->data->getAll();
 
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->saveAllData();
@@ -41,7 +45,7 @@ class PvPToggle extends PluginBase implements Listener
      */
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
     {
-        if ((strtolower($command->getName()) === "pvptoggle") and $sender instanceof Player) {
+        if (strtolower($command->getName()) === "pvptoggle") {
             if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
                 $player = $this->getServer()->getPlayerExact($args[0]);
 
@@ -52,38 +56,34 @@ class PvPToggle extends PluginBase implements Listener
 
                 if ($this->isPvpToggle($player)) {
                     $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
-                    unset($this->data["list"][array_search(strtolower($player->getName()), $this->data["list"], true)]);
+                    unset($this->allData["list"][array_search(strtolower($player->getName()), $this->allData["list"], true)]);
                 } else {
-                    $this->data["list"][] = strtolower($player->getName());
+                    $this->allData["list"][] = strtolower($player->getName());
                     $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.deactivated"))));
                 }
 
                 return true;
             }
 
-            if ($this->isPvpToggle($sender)) {
-                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
-                unset($this->data["list"][array_search(strtolower($sender->getName()), $this->data["list"], true)]);
-            } else {
-                $this->data["list"][] = strtolower($sender->getName());
-                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
+            if ($sender instanceof Player) {
+                if ($this->isPvpToggle($sender)) {
+                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
+                    unset($this->allData["list"][array_search(strtolower($sender->getName()), $this->allData["list"], true)]);
+                } else {
+                    $this->allData["list"][] = strtolower($sender->getName());
+                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
+                }
             }
         }
 
         return true;
     }
 
-    public function getData(): Config {
-        return new Config($this->getDataFolder() . "pvptoggleData.yml", Config::YAML, [
-            "list" => []
-        ]);
-    }
-
     /**
      * @return array
      */
     public function getAllData(): array {
-        return $this->data;
+        return $this->allData;
     }
 
     /**
@@ -92,7 +92,7 @@ class PvPToggle extends PluginBase implements Listener
      */
     public function isPvpToggle(Player $player): bool
     {
-        if (in_array(strtolower($player->getName()), $this->data["list"], true)) {
+        if (in_array(strtolower($player->getName()), $this->allData["list"], true)) {
             return true;
         }
 
@@ -101,8 +101,8 @@ class PvPToggle extends PluginBase implements Listener
 
     public function saveAllData(): void
     {
-        $this->getData()->setAll($this->data);
-        $this->getData()->save();
+        $this->data->setAll($this->allData);
+        $this->data->save();
     }
 
     public function onHit(EntityDamageByEntityEvent $event): void
