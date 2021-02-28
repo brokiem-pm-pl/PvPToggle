@@ -18,7 +18,7 @@ class PvPToggle extends PluginBase implements Listener
 {
 
     /** @var Config $data */
-    protected $data;
+    private $data;
 
     /** @var array $allData */
     private $allData = [];
