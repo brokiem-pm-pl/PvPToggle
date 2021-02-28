@@ -29,7 +29,7 @@ class PvPToggle extends PluginBase implements Listener
 
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->saveAllData();
-        }), 20 * 600);
+        }), 20 * (int) $this->getConfig()->get("save.data.delay"));
     }
 
     /**
@@ -41,34 +41,32 @@ class PvPToggle extends PluginBase implements Listener
      */
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
     {
-        if (strtolower($command->getName()) === "pvp") {
-            if ($sender instanceof Player) {
-                if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
-                    $player = $this->getServer()->getPlayerExact($args[0]);
+        if ((strtolower($command->getName()) === "pvptoggle") and $sender instanceof Player) {
+            if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
+                $player = $this->getServer()->getPlayerExact($args[0]);
 
-                    if ($player === null) {
-                        $sender->sendMessage("Player " . $args[0] . " doesn't exits!");
-                        return true;
-                    }
-
-                    if ($this->isPvpToggle($player)) {
-                        $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
-                        unset($this->data["list"][array_search(strtolower($player->getName()), $this->data["list"])]);
-                    } else {
-                        $this->data["list"] = strtolower($player->getName());
-                        $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
-                    }
-
+                if ($player === null) {
+                    $sender->sendMessage("Player " . $args[0] . " doesn't exits!");
                     return true;
                 }
 
-                if ($this->isPvpToggle($sender)) {
-                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
-                    unset($this->data["list"][array_search(strtolower($sender->getName()), $this->data["list"])]);
+                if ($this->isPvpToggle($player)) {
+                    $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                    unset($this->data["list"][array_search(strtolower($player->getName()), $this->data["list"], true)]);
                 } else {
-                    $this->data["list"] = strtolower($sender->getName());
-                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
+                    $this->data["list"] = strtolower($player->getName());
+                    $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
                 }
+
+                return true;
+            }
+
+            if ($this->isPvpToggle($sender)) {
+                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
+                unset($this->data["list"][array_search(strtolower($sender->getName()), $this->data["list"], true)]);
+            } else {
+                $this->data["list"] = strtolower($sender->getName());
+                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
             }
         }
 
@@ -81,6 +79,9 @@ class PvPToggle extends PluginBase implements Listener
         ]);
     }
 
+    /**
+     * @return array
+     */
     public function getAllData(): array {
         return $this->data;
     }
@@ -91,7 +92,7 @@ class PvPToggle extends PluginBase implements Listener
      */
     public function isPvpToggle(Player $player): bool
     {
-        if (in_array(strtolower($player->getName()), $this->data["list"])) {
+        if (in_array(strtolower($player->getName()), $this->data["list"], true)) {
             return true;
         }
 

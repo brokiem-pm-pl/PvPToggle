@@ -7,9 +7,11 @@ api: 3.10.0
 author: brokiem
 
 commands:
-  pvp:
+  pvptoggle:
     description: toggle pvp
     permission: pvptoggle.pvp
+    aliases:
+      - pvpt
 
 permissions:
   pvptoggle.pvp:

@@ -1,3 +1,11 @@
+# PvP Toggle by @brokiem (github.com/brokiem/PvPToggle)
+
+# Save pvptoggle data to file in seconds
+# Incrase this value if your server lags every 5 minutes
+# Default: 600
+save.data.delay: 600
+
+# Messages
 pvp.activated: "&aPvP Mode Activated!"
 pvp.deactivated: "&cPvP Mode Deactivated!"
 
