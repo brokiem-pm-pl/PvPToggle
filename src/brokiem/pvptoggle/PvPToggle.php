@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace brokiem\pvptoggle;
 
+use JackMD\UpdateNotifier\UpdateNotifier;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -34,6 +35,8 @@ class PvPToggle extends PluginBase implements Listener
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->saveAllData();
         }), 20 * (int) $this->getConfig()->get("save.data.delay"));
+
+        UpdateNotifier::checkUpdate($this->getDescription()->getName(), $this->getDescription()->getVersion());
     }
 
     /**
