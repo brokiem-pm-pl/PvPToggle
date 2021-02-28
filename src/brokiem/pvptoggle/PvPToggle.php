@@ -51,22 +51,22 @@ class PvPToggle extends PluginBase implements Listener
                 }
 
                 if ($this->isPvpToggle($player)) {
-                    $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
                     unset($this->data["list"][array_search(strtolower($player->getName()), $this->data["list"], true)]);
                 } else {
-                    $this->data["list"] = strtolower($player->getName());
-                    $sender->sendMessage(str_replace($player->getName(), "{name}", TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                    $this->data["list"][] = strtolower($player->getName());
+                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.deactivated"))));
                 }
 
                 return true;
             }
 
             if ($this->isPvpToggle($sender)) {
-                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
+                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
                 unset($this->data["list"][array_search(strtolower($sender->getName()), $this->data["list"], true)]);
             } else {
-                $this->data["list"] = strtolower($sender->getName());
-                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
+                $this->data["list"][] = strtolower($sender->getName());
+                $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
             }
         }
 
@@ -74,7 +74,7 @@ class PvPToggle extends PluginBase implements Listener
     }
 
     public function getData(): Config {
-        return new Config($this->getDataFolder() . "pvptoggleData", Config::YAML, [
+        return new Config($this->getDataFolder() . "pvptoggleData.yml", Config::YAML, [
             "list" => []
         ]);
     }
@@ -118,7 +118,7 @@ class PvPToggle extends PluginBase implements Listener
             }
 
             if ($this->isPvpToggle($entity)) {
-                $damager->sendMessage(str_replace($entity->getDisplayName(), "{name}", TF::colorize($this->getConfig()->get("pvp.is.activated.entity"))));
+                $damager->sendMessage(str_replace("{name}", $entity->getDisplayName(), TF::colorize($this->getConfig()->get("pvp.is.activated.entity"))));
                 $event->setCancelled();
             }
         }
