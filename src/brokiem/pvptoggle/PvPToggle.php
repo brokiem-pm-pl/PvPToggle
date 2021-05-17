@@ -4,50 +4,36 @@ declare(strict_types=1);
 
 namespace brokiem\pvptoggle;
 
-use JackMD\UpdateNotifier\UpdateNotifier;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 
-class PvPToggle extends PluginBase implements Listener
-{
+class PvPToggle extends PluginBase implements Listener {
 
-    /** @var Config $data */
-    private $data;
+    private Config $data;
 
-    /** @var array $allData */
-    private $allData = [];
+    private array $allData = [];
 
-    public function onEnable(): void
-    {
+    public function onEnable(): void {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
 
         $this->data = new Config($this->getDataFolder() . "pvptoggleData.yml", Config::YAML, ["list" => []]);
         $this->allData = $this->data->getAll();
 
-        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void {
             $this->saveAllData();
-        }), 20 * (int) $this->getConfig()->get("save.data.delay"));
+        }), 20 * (int)$this->getConfig()->get("save.data.delay"));
 
-        UpdateNotifier::checkUpdate($this->getDescription()->getName(), $this->getDescription()->getVersion());
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param Command $command
-     * @param string $label
-     * @param array $args
-     * @return bool
-     */
-    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
-    {
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if (strtolower($command->getName()) === "pvptoggle") {
             if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
                 $player = $this->getServer()->getPlayerExact($args[0]);
@@ -82,19 +68,11 @@ class PvPToggle extends PluginBase implements Listener
         return true;
     }
 
-    /**
-     * @return array
-     */
     public function getAllData(): array {
         return $this->allData;
     }
 
-    /**
-     * @param Player $player
-     * @return bool
-     */
-    public function isPvpToggle(Player $player): bool
-    {
+    public function isPvpToggle(Player $player): bool {
         if (in_array(strtolower($player->getName()), $this->allData["list"], true)) {
             return true;
         }
@@ -102,33 +80,30 @@ class PvPToggle extends PluginBase implements Listener
         return false;
     }
 
-    public function saveAllData(): void
-    {
+    public function saveAllData(): void {
         $this->data->setAll($this->allData);
         $this->data->save();
     }
 
-    public function onHit(EntityDamageByEntityEvent $event): void
-    {
+    public function onHit(EntityDamageByEntityEvent $event): void {
         $entity = $event->getEntity();
         $damager = $event->getDamager();
 
         if ($entity instanceof Player and $damager instanceof Player) {
             if ($this->isPvpToggle($damager)) {
                 $damager->sendMessage(TF::colorize($this->getConfig()->get("pvp.is.activated.damager")));
-                $event->setCancelled();
+                $event->cancel();
                 return;
             }
 
             if ($this->isPvpToggle($entity)) {
                 $damager->sendMessage(str_replace("{name}", $entity->getDisplayName(), TF::colorize($this->getConfig()->get("pvp.is.activated.entity"))));
-                $event->setCancelled();
+                $event->cancel();
             }
         }
     }
 
-    public function onDisable(): void
-    {
+    public function onDisable(): void {
         $this->saveAllData();
     }
 }

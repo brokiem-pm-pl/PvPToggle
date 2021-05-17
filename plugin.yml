@@ -2,7 +2,7 @@ name: PvPToggle
 main: brokiem\pvptoggle\PvPToggle
 
 version: 1.0.0
-api: 3.10.0
+api: 4.0.0
 
 author: brokiem
 
