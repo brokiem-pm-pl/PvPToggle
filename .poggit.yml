@@ -7,6 +7,6 @@ projects:
   PvPToggle:
     path: ""
     libs:
-      - src: JackMD/UpdateNotifier/UpdateNotifier
-        version: ^2.1
+      - src: ifera-mc/UpdateNotifier/UpdateNotifier
+        version: ^3.0.0
 ...
