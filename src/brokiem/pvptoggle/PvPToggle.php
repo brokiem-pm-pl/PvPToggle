@@ -36,7 +36,7 @@ class PvPToggle extends PluginBase implements Listener {
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if (strtolower($command->getName()) === "pvptoggle") {
             if (isset($args[0]) and $sender->hasPermission("pvptoggle.staff")) {
-                $player = $this->getServer()->getPlayerExact($args[0]);
+                $player = $this->getServer()->getPlayerByPrefix($args[0]);
 
                 if ($player === null) {
                     $sender->sendMessage("Player " . $args[0] . " doesn't exits!");
@@ -74,6 +74,10 @@ class PvPToggle extends PluginBase implements Listener {
 
     public function isPvpToggle(Player $player): bool {
         if (in_array(strtolower($player->getName()), $this->allData["list"], true)) {
+            if ($this->getConfig()->get("default.pvp")) {
+                return false;
+            }
+
             return true;
         }
 

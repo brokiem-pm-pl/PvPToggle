@@ -5,6 +5,9 @@
 # Default: 600
 save.data.delay: 600
 
+# Enable pvp on default setting/new player
+default.pvp: off
+
 # Messages
 pvp.activated: "&aPvP Mode Activated!"
 pvp.deactivated: "&cPvP Mode Deactivated!"
