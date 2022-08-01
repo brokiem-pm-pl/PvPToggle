@@ -46,11 +46,11 @@ class PvPToggle extends PluginBase implements Listener {
                 }
 
                 if ($this->isPvpToggle($player)) {
-                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
+                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.deactivated"))));
                     unset($this->allData["list"][array_search(strtolower($player->getName()), $this->allData["list"], true)]);
                 } else {
+                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.activated"))));
                     $this->allData["list"][] = strtolower($player->getName());
-                    $sender->sendMessage(str_replace("{name}", $player->getDisplayName(), TF::colorize($this->getConfig()->get("staff.pvp.deactivated"))));
                 }
 
                 return true;
@@ -58,11 +58,11 @@ class PvPToggle extends PluginBase implements Listener {
 
             if ($sender instanceof Player) {
                 if ($this->isPvpToggle($sender)) {
-                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
                     unset($this->allData["list"][array_search(strtolower($sender->getName()), $this->allData["list"], true)]);
+                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
                 } else {
                     $this->allData["list"][] = strtolower($sender->getName());
-                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.deactivated")));
+                    $sender->sendMessage(TF::colorize($this->getConfig()->get("pvp.activated")));
                 }
             }
         }
@@ -88,13 +88,13 @@ class PvPToggle extends PluginBase implements Listener {
         $damager = $event->getDamager();
 
         if ($entity instanceof Player and $damager instanceof Player) {
-            if ($this->isPvpToggle($damager)) {
+            if (!$this->isPvpToggle($damager)) {
                 $damager->sendMessage(TF::colorize($this->getConfig()->get("pvp.is.activated.damager")));
                 $event->cancel();
                 return;
             }
 
-            if ($this->isPvpToggle($entity)) {
+            if (!$this->isPvpToggle($entity)) {
                 $damager->sendMessage(str_replace("{name}", $entity->getDisplayName(), TF::colorize($this->getConfig()->get("pvp.is.activated.entity"))));
                 $event->cancel();
             }
