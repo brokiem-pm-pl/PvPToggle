@@ -76,7 +76,7 @@ class PvPToggle extends PluginBase implements Listener {
 
     public function isPvpToggle(Player $player): bool {
         if (in_array(strtolower($player->getName()), $this->allData["list"], true)) {
-            return $this->getConfig()->get("default.pvp") !== "on";
+            return $this->getConfig()->get("default.pvp") === "on";
         }
 
         return false;
