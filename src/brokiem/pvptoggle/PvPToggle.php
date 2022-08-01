@@ -88,13 +88,13 @@ class PvPToggle extends PluginBase implements Listener {
         $damager = $event->getDamager();
 
         if ($entity instanceof Player and $damager instanceof Player) {
-            if ($this->isPvpToggle($damager) and ($this->getConfig()->get("default.pvp") === "on")) {
+            if ($this->isPvpToggle($damager)) {
                 $damager->sendMessage(TF::colorize($this->getConfig()->get("pvp.is.activated.damager")));
                 $event->cancel();
                 return;
             }
 
-            if ($this->isPvpToggle($entity) and ($this->getConfig()->get("default.pvp") === "on")) {
+            if ($this->isPvpToggle($entity)) {
                 $damager->sendMessage(str_replace("{name}", $entity->getDisplayName(), TF::colorize($this->getConfig()->get("pvp.is.activated.entity"))));
                 $event->cancel();
             }
