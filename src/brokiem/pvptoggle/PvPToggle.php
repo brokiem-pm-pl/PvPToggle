@@ -30,7 +30,6 @@ class PvPToggle extends PluginBase implements Listener {
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void {
             $this->saveAllData();
         }), 20 * (int)$this->getConfig()->get("save.data.delay"));
-
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
@@ -74,11 +73,7 @@ class PvPToggle extends PluginBase implements Listener {
 
     public function isPvpToggle(Player $player): bool {
         if (in_array(strtolower($player->getName()), $this->allData["list"], true)) {
-            if ($this->getConfig()->get("default.pvp")) {
-                return false;
-            }
-
-            return true;
+            return $this->getConfig()->get("default.pvp") !== "on";
         }
 
         return false;
